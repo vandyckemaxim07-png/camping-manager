@@ -939,8 +939,8 @@
                         <div class="value" id="todayReservations">0</div>
                     </div>
                     <div class="stat-card">
-                        <h3>Revenus du mois</h3>
-                        <div class="value" id="monthlyRevenue">0 €</div>
+                        <h3>🏠 Chalets occupés</h3>
+                        <div class="value" id="chaletsOccupes">0/8</div>
                     </div>
                     <div class="stat-card">
                         <h3>Taux d'occupation</h3>
@@ -3816,13 +3816,17 @@ Cordialement,"></textarea>
             const total = data.emplacements.length;
             const todayRes = data.reservations.filter(r => r.dateArrivee === todayStr).length;
             
-            const monthlyRev = data.reservations
-                .filter(r => new Date(r.dateArrivee).getMonth() === new Date().getMonth())
-                .reduce((sum, r) => sum + parseFloat(r.montant), 0);
+            // Calculer le nombre de chalets occupés aujourd'hui
+            const chaletsOccupes = data.reservations.filter(res => {
+                if (!isDateBetween(today, res.dateArrivee, res.dateDepart)) return false;
+                // Les chalets sont les emplacements 38-45 (8 chalets)
+                return res.emplacementId >= 38 && res.emplacementId <= 45;
+            }).length;
+            const totalChalets = 8; // Nombre total de chalets
 
             document.getElementById('occupiedSpots').textContent = `${occupied}/${total}`;
             document.getElementById('todayReservations').textContent = todayRes;
-            document.getElementById('monthlyRevenue').textContent = `${monthlyRev.toFixed(2)} €`;
+            document.getElementById('chaletsOccupes').textContent = `${chaletsOccupes}/${totalChalets}`;
             document.getElementById('occupancyRate').textContent = `${Math.round((occupied/total)*100)}%`;
 
             updateRecentReservations();
